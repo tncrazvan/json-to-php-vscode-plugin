@@ -14,8 +14,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "json-to-php.helloWorld",
-        "title": "Hello World"
+        "command": "json-to-php.set-jtp-phar",
+        "title": "Jtp: Set jtp phar"
+      },
+      {
+        "command": "json-to-php.set-php-binary",
+        "title": "Jtp: Set php binary"
+      },
+      {
+        "command": "json-to-php.transpile",
+        "title": "Jtp: Transpile"
       }
     ]
   },
@@ -23,7 +31,8 @@
     "lint": "eslint .",
     "pretest": "pnpm run lint",
     "test": "vscode-test",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
