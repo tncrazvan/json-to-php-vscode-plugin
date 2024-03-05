@@ -13,7 +13,7 @@
     "url": "https://razshare.dev"
   },
   "homepage": "https://github.com/tncrazvan/json-to-php-vscode-plugin",
-  "publisher": "Razvan Tanase",
+  "publisher": "razshare",
   "keywords": [
     "php",
     "json",
@@ -51,7 +51,8 @@
     "pretest": "pnpm run lint",
     "test": "vscode-test",
     "build": "rollup -c",
-    "package": "vsce package"
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.2",
