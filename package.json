@@ -3,6 +3,25 @@
   "displayName": "Json to Php",
   "description": "",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tncrazvan/json-to-php-vscode-plugin"
+  },
+  "author": {
+    "name": "Razvan Tanase",
+    "email": "tangent.jotey@gmail.com",
+    "url": "https://razshare.dev"
+  },
+  "homepage": "https://github.com/tncrazvan/json-to-php-vscode-plugin",
+  "publisher": "Razvan Tanase",
+  "keywords": [
+    "php",
+    "json",
+    "definition",
+    "transpile",
+    "amphp",
+    "catpaw"
+  ],
   "engines": {
     "vscode": "^1.87.0"
   },
