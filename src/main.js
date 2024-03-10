@@ -1,19 +1,44 @@
+import which from 'which'
 import { spawn } from 'child_process'
-import { commands, window } from 'vscode'
+import { commands, window, workspace } from 'vscode'
 
 const decoder = new TextDecoder('UTF-8')
+
+function inWorkspace() {
+  if (!workspace.workspaceFolders) {
+    console.error(
+      'Json to Php must be run in a workspace. Select a workspace and reload the window.',
+    )
+    return false
+  }
+  console.log(`Workspace detected `)
+  return true
+}
 
 /**
  *
  * @param {import('vscode').ExtensionContext} context
  */
-export async function activate({ subscriptions, globalState }) {
+export async function activate({ subscriptions }) {
   try {
+    const config = workspace.getConfiguration('json-to-php')
+
     console.log('Activating json-to-php.')
 
-    subscriptions.push(askForPhp({ globalState }))
-    subscriptions.push(askForJtp({ globalState }))
-    subscriptions.push(translateCurrentFile({ globalState }))
+    try {
+      const defaultWhichPhp = await which('php')
+      const currentWhichPhp = config.get('php')
+      console.log('currentWhichPhp', currentWhichPhp)
+      if (!currentWhichPhp) {
+        config.update('php', defaultWhichPhp)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    subscriptions.push(askForPhp())
+    subscriptions.push(askForJtp())
+    subscriptions.push(translateCurrentFile())
   } catch (err) {
     console.error(err)
   }
@@ -54,83 +79,85 @@ async function findJtp() {
   return items[0]
 }
 
-/**
- * @param {{globalState:import('vscode').Memento}} payload
- * @returns
- */
-function askForPhp({ globalState }) {
+function askForPhp() {
   return commands.registerCommand(
-    'json-to-php.set-php-binary',
+    'json-to-php.set-php-path',
     async function run() {
+      if (!inWorkspace()) {
+        return
+      }
       const whichPhp = await findPhp()
       if (!whichPhp) {
         console.log('Php not found.')
         return
       }
-      await globalState.update('php', whichPhp)
-      console.log('Php found at', whichPhp)
+
+      const config = workspace.getConfiguration('json-to-php')
+
+      await config.update('php', whichPhp.fsPath)
+
+      console.log('Php found at', whichPhp.fsPath)
     },
   )
 }
 
-/**
- * @param {{globalState:import('vscode').Memento}} payload
- * @returns
- */
-function askForJtp({ globalState }) {
+function askForJtp() {
   return commands.registerCommand(
-    'json-to-php.set-jtp-phar',
+    'json-to-php.set-jtp-path',
     async function run() {
+      if (!inWorkspace()) {
+        return
+      }
       const whichJtp = await findJtp()
       if (!whichJtp) {
         console.log('Jtp not found.')
         return
       }
-      await globalState.update('jtp', whichJtp)
-      console.log('Jtp found at', whichJtp)
+
+      const config = workspace.getConfiguration('json-to-php')
+
+      await config.update('jtp', whichJtp.fsPath)
+
+      console.log('Jtp found at', whichJtp.fsPath)
     },
   )
 }
 
-/**
- * @param {{globalState:import('vscode').Memento}} payload
- * @returns
- */
-function translateCurrentFile({ globalState }) {
+function translateCurrentFile() {
   return commands.registerCommand(
-    'json-to-php.transpile',
+    'json-to-php.convert-current-file',
     async function run() {
+      const config = workspace.getConfiguration('json-to-php')
+
       /**
-       * @type {undefined|import('vscode').Uri}
+       * @type {undefined|string}
        */
-      const whichPhp = globalState.get('php')
+      const whichPhp = config.get('php')
       if (!whichPhp) {
         console.log('Php not found.')
         return
       }
       /**
-       * @type {undefined|import('vscode').Uri}
+       * @type {undefined|string}
        */
-      const whichJtp = globalState.get('jtp')
+      const whichJtp = config.get('jtp')
       if (!whichJtp) {
         console.log('Jtp not found.')
         return
       }
 
-      const php = whichPhp.fsPath
-      if (!php) {
+      if (!whichPhp) {
         console.log('Php not found.')
         return
       }
-      const jtp = whichJtp.fsPath
-      if (!jtp) {
+      if (!whichJtp) {
         console.log('Jtp not found.')
         return
       }
 
       const fileName = window.activeTextEditor?.document.fileName ?? ''
-      console.log(`Spawning ${php} ${jtp} ${fileName}...`)
-      const process = spawn(php, [jtp, fileName])
+      console.log(`Spawning ${whichPhp} ${whichJtp} ${fileName}...`)
+      const process = spawn(whichPhp, [whichJtp, fileName])
 
       process.stdout.on('data', function stdout(data) {
         console.log(decoder.decode(Buffer.from(data)))

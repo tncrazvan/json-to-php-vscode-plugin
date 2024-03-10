@@ -2,7 +2,7 @@
   "name": "json-to-php",
   "displayName": "Json to Php",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/tncrazvan/json-to-php-vscode-plugin"
@@ -33,18 +33,34 @@
   "contributes": {
     "commands": [
       {
-        "command": "json-to-php.set-jtp-phar",
-        "title": "Jtp: Set jtp phar"
+        "command": "json-to-php.set-jtp-path",
+        "title": "Jtp: Set jtp path"
       },
       {
-        "command": "json-to-php.set-php-binary",
-        "title": "Jtp: Set php binary"
+        "command": "json-to-php.set-php-path",
+        "title": "Jtp: Set php path"
       },
       {
-        "command": "json-to-php.transpile",
-        "title": "Jtp: Transpile"
+        "command": "json-to-php.convert-current-file",
+        "title": "Jtp: Convert current file"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Json to Php",
+      "properties": {
+        "json-to-php.jtp": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the jtp program."
+        },
+        "json-to-php.php": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the php binary."
+        }
+      }
+    }
   },
   "scripts": {
     "lint": "eslint .",
